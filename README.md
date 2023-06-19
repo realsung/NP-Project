@@ -12,13 +12,13 @@ $10^(-10^9.270744172598489)$ 정도의 확률로 깨지 못함.
 gcc -o bin/worker worker/main.c -lssl -lcrypto
 gcc -o bin/spawner spawner/main.c -lssl -lcrypto
 cd bin
-./spawner hida 8
+`./spawner hida 8`
 ```
 
 ## To build
 
 
-Worker
+Worker`
 
 ```
 gcc -o bin/worker worker/main.c -lssl -lcrypto

@@ -1,6 +1,7 @@
 #include <sys/sysinfo.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/prctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -65,6 +66,7 @@ int main(int argc,char** argv){
         if (fcntl(link[i][0], F_SETFL, O_NONBLOCK)==-1) exit(printf("fcntl Failed : %d",errno));
         if ((pids[i] = fork()) == -1) exit(printf("fork Failed : %d",errno));
         if(pids[i] == 0) {
+            prctl( PR_SET_PDEATHSIG, SIGKILL );
             dup2(link[i][1], STDOUT_FILENO);
             close(link[i][0]);
             close(link[i][1]);
