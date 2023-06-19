@@ -63,12 +63,16 @@ void connectWorkers(char *buf){
 
 void sendChallenge(char *buf){
     int fd=socketFD[(roundrobin++)%socketCnt];
-    write(fd,"\x55\x01",2);
     char *chal=strtok(buf," ");
-    char *diff=atoi(strtok(buf,"\n"));
+    uint8_t diff=atoi(strtok(buf,"\n"));
     int jobid=(time(NULL)<<12)+rand();
     uint8_t challlen=strlen(chal);
-    
+    write(fd,"\x55\x01",2);
+
+    write(fd,&challlen,1);
+    write(fd,chal,challlen);
+    write(fd,&jobid,4);
+    write(fd,&diff,1);
 }
 
 int main(int argc, char **argv)
@@ -92,13 +96,13 @@ int main(int argc, char **argv)
         ev.data.u32 = socketCnt-1;
         epoll_ctl(epollfd, EPOLL_CTL_ADD, socketFD[socketCnt-1], &ev);
     } 
+    fclose(fp);
 
-
-    FILE *fp=fopen(argv[2],"r");
-    char buf[BUF_SIZE]={0,};
+    fp=fopen(argv[2],"r");
     while(fgets(buf,BUF_SIZE-1,fp)!= NULL){
         sendChallenge(buf);
     }
+    fclose(fp);
     
     for(int i=0;i<socketCnt;i++){
         close(socketFD[i]);
